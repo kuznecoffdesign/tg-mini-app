@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { NewHero, ProductPrinciples, IntegrationFeature, Reveal } from './VisualSystem.jsx';
 import { Formats, SolutionsList, Comparison, Pricing, ConceptPreview, JournalList, ServiceContent, ArticleContent, DataFlow } from './Solutions.jsx';
 import { services, articles, extraMeta, publicOrigin } from './content.js';
+import { logicalPath, publicPath } from './paths.js';
 import {
   ArrowDownRight, ArrowLeft, ArrowRight, Buildings, Check, CheckCircle,
   CreditCard, Cube, Database, List, LockKey, Package, PaperPlaneTilt,
@@ -34,7 +35,7 @@ function track(name, detail = {}) {
 }
 
 function navigate(path) {
-  window.history.pushState({}, "", path);
+  window.history.pushState({}, "", publicPath(path));
   window.dispatchEvent(new PopStateEvent("popstate"));
   const hash = path.includes("#") ? path.split("#")[1] : "";
   requestAnimationFrame(() => {
@@ -50,7 +51,7 @@ function navigate(path) {
 
 function Link({ href, children, className = "", onClick, ...props }) {
   const internal = href.startsWith("/");
-  return <a href={href} className={className} onClick={(event) => {
+  return <a href={publicPath(href)} className={className} onClick={(event) => {
     onClick?.(event);
     if (!event.defaultPrevented && internal && !event.metaKey && !event.ctrlKey) {
       event.preventDefault(); navigate(href);
@@ -124,7 +125,7 @@ function ProductDemo({ compact = false }) {
   return <div className={`product-demo ${compact ? "compact-demo" : ""}`}><div className="demo-copy"><div className="demo-tabs" role="tablist" aria-label="Состояния Mini App">{demoSteps.map((item) => <button key={item.id} role="tab" aria-selected={step === item.id} className={step === item.id ? "active" : ""} onClick={() => { setStep(item.id); track("demo_step", { step: item.id }); }}>{item.label}</button>)}</div><div className="demo-description" key={step}><span>{String(demoSteps.indexOf(current) + 1).padStart(2, "0")} / 05</span><h3>{current.title}</h3><p>{current.text}</p></div><div className="demo-progress" aria-hidden="true"><span style={{ width: `${((demoSteps.indexOf(current) + 1) / demoSteps.length) * 100}%` }}/></div></div><div className="demo-stage"><div className="stage-caption">Демо-интерфейс · Концепт Mini App</div><DemoPhone step={step} compact={compact}/><div className="stage-note note-one"><Database size={18}/><span>Статус обновлён</span></div><div className="stage-note note-two"><CheckCircle size={18}/><span>Данные переданы</span></div></div></div>;
 }
 
-function Hero() { return <section className="hero"><div className="container hero-grid"><div className="hero-copy"><span className="eyebrow">Telegram Mini Apps для бизнеса</span><h1>Продукт внутри Telegram. От первого экрана до рабочего сервиса.</h1><p>Магазины, личные кабинеты и внутренние инструменты: проектируем путь пользователя, интерфейс и связь с системами компании.</p><div className="hero-actions"><PrimaryCta/><Link href="/cases" className="text-link">Смотреть концепты <ArrowRight size={18}/></Link></div><small className="next-step">Опишите задачу — уточним сценарий и предложим формат следующего шага.</small></div><div className="hero-visual"><img src="/images/hero-infrastructure.png" width="1536" height="1024" alt="" aria-hidden="true"/><div className="hero-phone"><DemoPhone step="catalog" compact/></div><div className="hero-data-card"><span>Заказ №1048</span><b>Передан в систему</b><div><i/><i/><i/></div></div></div></div><div className="container hero-strip"><span>Сценарий</span><b>Выбор → заказ → оплата → статус</b><span>Всё в одном диалоге</span></div></section>; }
+function Hero() { return <section className="hero"><div className="container hero-grid"><div className="hero-copy"><span className="eyebrow">Telegram Mini Apps для бизнеса</span><h1>Продукт внутри Telegram. От первого экрана до рабочего сервиса.</h1><p>Магазины, личные кабинеты и внутренние инструменты: проектируем путь пользователя, интерфейс и связь с системами компании.</p><div className="hero-actions"><PrimaryCta/><Link href="/cases" className="text-link">Смотреть концепты <ArrowRight size={18}/></Link></div><small className="next-step">Опишите задачу — уточним сценарий и предложим формат следующего шага.</small></div><div className="hero-visual"><img src={publicPath("/images/hero-infrastructure.png")} width="1536" height="1024" alt="" aria-hidden="true"/><div className="hero-phone"><DemoPhone step="catalog" compact/></div><div className="hero-data-card"><span>Заказ №1048</span><b>Передан в систему</b><div><i/><i/><i/></div></div></div></div><div className="container hero-strip"><span>Сценарий</span><b>Выбор → заказ → оплата → статус</b><span>Всё в одном диалоге</span></div></section>; }
 
 function Concepts() { return <section className="section concepts-section"><div className="container"><div className="section-row"><SectionIntro eyebrow="Концепты" title="Показываем продукт через сценарий."/><Link href="/cases" className="text-link">Все концепты <ArrowRight size={18}/></Link></div><div className="concept-stack"><Link href="/cases/sever-supply" className="concept concept-wide"><div className="concept-copy"><span className="tag">Концепт</span><h3>Север.Снабжение</h3><p>Заказ расходных материалов, согласование и контроль доставки для распределённой команды.</p><span className="concept-link">Разобрать сценарий <ArrowRight size={17}/></span></div><div className="concept-scene"><DemoPhone step="status" compact/><div className="order-panel"><small>Согласование</small><b>Одобрено</b><span><Check size={14}/> 12 позиций</span></div></div></Link><Link href="/services/telegram-commerce" className="concept concept-split"><div className="concept-art"><div className="catalog-mosaic"><ProductCard name="Крафт-пакет" price="18 ₽" tone="sand"/><ProductCard name="Термолента" price="96 ₽" tone="white"/><ProductCard name="Короб S" price="54 ₽" tone="orange"/></div></div><div className="concept-copy"><span className="tag">Концепт</span><h3>Каталог без лишнего перехода</h3><p>Пользователь выбирает, оплачивает и отслеживает заказ в одном Mini App.</p><span className="concept-link">Telegram-магазины <ArrowRight size={17}/></span></div></Link></div></div></section>; }
 
@@ -222,8 +223,8 @@ function updateMeta(path) {
 }
 
 export function App({initialPath}) {
-  const [path, setPath] = useState(()=>initialPath || window.location.pathname.replace(/\/$/, "") || "/");
-  useEffect(() => { const onPop = () => setPath(window.location.pathname.replace(/\/$/, "") || "/"); window.addEventListener("popstate", onPop); return () => window.removeEventListener("popstate", onPop); }, []);
+  const [path, setPath] = useState(()=>initialPath || logicalPath(window.location.pathname));
+  useEffect(() => { const onPop = () => setPath(logicalPath(window.location.pathname)); window.addEventListener("popstate", onPop); return () => window.removeEventListener("popstate", onPop); }, []);
   useEffect(() => updateMeta(path), [path]);
   const pages = { "/": HomePage, "/cases": CasesPage, "/cases/sever-supply": CasePage, "/services/telegram-commerce": ServicePage, "/contact": ContactPage, "/privacy": PrivacyPage, '/services':SolutionsPage, '/journal':JournalPage };
   const slug=path.split('/').pop();
