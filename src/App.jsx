@@ -5,8 +5,8 @@ import { services, articles, extraMeta, publicOrigin } from './content.js';
 import { logicalPath, publicPath } from './paths.js';
 import {
   ArrowDownRight, ArrowLeft, ArrowRight, Buildings, Check, CheckCircle,
-  CreditCard, Cube, Database, List, LockKey, Package, PaperPlaneTilt,
-  ShoppingBag, Storefront, UserCircle, X,
+  CreditCard, Cube, Database, Desktop, List, LockKey, Moon, Package, PaperPlaneTilt,
+  ShoppingBag, Storefront, Sun, UserCircle, X,
 } from "@phosphor-icons/react";
 
 const site = { name: "Mini Apps / Studio", baseUrl: publicOrigin, telegramUrl: "" };
@@ -74,6 +74,46 @@ function Brand() {
   </Link>;
 }
 
+const themeOptions = [
+  { value: "light", label: "Светлая тема", Icon: Sun },
+  { value: "system", label: "Системная тема", Icon: Desktop },
+  { value: "dark", label: "Тёмная тема", Icon: Moon },
+];
+
+function ThemeSwitcher() {
+  const [preference, setPreference] = useState(() => {
+    if (typeof document !== "undefined") return document.documentElement.dataset.themePreference || "system";
+    return "system";
+  });
+
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const apply = () => {
+      const resolved = preference === "system" ? (media.matches ? "dark" : "light") : preference;
+      document.documentElement.dataset.themePreference = preference;
+      document.documentElement.dataset.theme = resolved;
+      document.documentElement.style.colorScheme = resolved;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", resolved === "dark" ? "#090b0c" : "#f5f7fb");
+    };
+    apply();
+    localStorage.setItem("studio-theme", preference);
+    if (preference === "system") media.addEventListener("change", apply);
+    return () => media.removeEventListener("change", apply);
+  }, [preference]);
+
+  return <div className="theme-switcher" data-value={preference} role="group" aria-label="Цветовая тема">
+    <span className="theme-switcher-indicator" aria-hidden="true" />
+    {themeOptions.map(({ value, label, Icon }) => <button
+      type="button"
+      key={value}
+      aria-label={label}
+      aria-pressed={preference === value}
+      title={label}
+      onClick={() => setPreference(value)}
+    ><Icon size={17} weight={preference === value ? "fill" : "regular"} /></button>)}
+  </div>;
+}
+
 function Header() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef(null);
@@ -94,7 +134,7 @@ function Header() {
     return () => { document.body.style.overflow = ""; document.removeEventListener("keydown", handleKey); };
   }, [open]);
   const nav = <><Link href="/cases" onClick={() => setOpen(false)}>Кейсы</Link><Link href="/services" onClick={() => setOpen(false)}>Решения</Link><Link href="/#process" onClick={() => setOpen(false)}>Процесс</Link><Link href="/#pricing" onClick={() => setOpen(false)}>Стоимость</Link></>;
-  return <header className="site-header"><div className="container header-inner"><Brand/><nav className="desktop-nav" aria-label="Основная навигация">{nav}</nav><PrimaryCta className="header-cta"/><button className="icon-button menu-button" aria-label="Открыть меню" aria-expanded={open} onClick={() => setOpen(true)}><List size={24}/></button></div>
+  return <header className="site-header"><div className="container header-inner"><Brand/><nav className="desktop-nav" aria-label="Основная навигация">{nav}</nav><ThemeSwitcher/><PrimaryCta className="header-cta"/><button className="icon-button menu-button" aria-label="Открыть меню" aria-expanded={open} onClick={() => setOpen(true)}><List size={24}/></button></div>
     {open && <div className="mobile-nav-backdrop" role="presentation" onMouseDown={(e) => e.target === e.currentTarget && setOpen(false)}><nav className="mobile-nav" aria-label="Мобильная навигация" ref={panelRef}><div className="mobile-nav-top"><Brand/><button className="icon-button" aria-label="Закрыть меню" onClick={() => setOpen(false)}><X size={22}/></button></div><div className="mobile-nav-links">{nav}</div><PrimaryCta/></nav></div>}
   </header>;
 }
